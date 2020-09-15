@@ -1,0 +1,38 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  padding-top: 50px;
+}
+
+.search-form {
+  &__input {
+    width: 100%;
+    line-height: 1.5;
+    padding: 20px 10px 20px 10px;
+    outline-style: none;
+  }
+
+  &__btn {
+    width: 140px;
+  }
+}
+
+.input-wrapper {
+  display: flex;
+}
+
+.copyright {
+  display: flex;
+  align-content: center;
+
+  &__text {
+    margin-right: 5px;
+  }
+  &__link {
+    display: flex;
+  }
+}
