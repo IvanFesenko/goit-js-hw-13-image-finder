@@ -17,8 +17,9 @@ const ImageFinder = {
 };
 
 refs.btnSearch.addEventListener('click', onClickSearch);
-refs.btnLoadMore.addEventListener('click', onClickLoadMore);
+// refs.btnLoadMore.addEventListener('click', onClickLoadMore);
 refs.gallery.addEventListener('click', onImageClick);
+window.addEventListener('scroll', loadMore);
 
 function getURL() {
   return `https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${ImageFinder.searchQuery}&page=${ImageFinder.page}&per_page=12&${ImageFinder.key}`;
@@ -63,8 +64,12 @@ function onClickSearch(event) {
   getData(URL).then(generateLayout);
 }
 
-function onClickLoadMore(event) {
-  ImageFinder.page += 1;
-  const URL = getURL();
-  getData(URL).then(generateLayout);
+function loadMore() {
+  const windowRelativeBottom = document.documentElement.getBoundingClientRect()
+    .bottom;
+  if (windowRelativeBottom < document.documentElement.clientHeight + 100) {
+    ImageFinder.page += 1;
+    const URL = getURL();
+    getData(URL).then(generateLayout);
+  }
 }
