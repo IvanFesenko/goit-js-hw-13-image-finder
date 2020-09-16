@@ -1,4 +1,7 @@
 import error from './notify';
+import galleryTemplate from '../templates/gallery.hbs';
+
+const basicLightbox = require('basiclightbox');
 
 const refs = {
   btnSearch: document.querySelector('.search-form__btn'),
@@ -8,34 +11,60 @@ const refs = {
   form: document.querySelector('.search-form'),
 };
 
-refs.btnSearch.addEventListener('click', onClickSearch);
+const ImageFinder = {
+  key: 'key=18267918-a545f4b922b3d8b59313b99e1',
+  page: 1,
+};
 
-function getURL(query, page) {
-  const key = `key=18267918-a545f4b922b3d8b59313b99e1`;
-  return `https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${query}&page=${page}&per_page=12&${key}`;
+refs.btnSearch.addEventListener('click', onClickSearch);
+refs.btnLoadMore.addEventListener('click', onClickLoadMore);
+refs.gallery.addEventListener('click', onImageClick);
+
+function getURL() {
+  return `https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${ImageFinder.searchQuery}&page=${ImageFinder.page}&per_page=12&${ImageFinder.key}`;
 }
 
-function getData(url) {
-  return fetch(url)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(`Ошибка по адресу ${url}, 
-      статус ошибки ${response.status}!`);
-    })
-    .then(({ hits }) => hits)
-    .catch(err => {
-      error({
-        title: 'Wrong query! Please try again',
-      });
-    });
+async function getData(url) {
+  const response = await fetch(url);
+  const data = await response.json();
+  const { hits, total } = data;
+  return { hits, total };
+}
+
+function generateLayout(data) {
+  const layout = galleryTemplate(data.hits);
+  refs.gallery.insertAdjacentHTML('beforeend', layout);
+}
+
+function clearGallery() {
+  refs.gallery.innerHTML = '';
+}
+
+function onImageClick(event) {
+  if (event.target.nodeName !== 'IMG') {
+    return;
+  }
+  const src = event.target.dataset.source;
+  basicLightbox
+    .create(
+      `
+  	<img width="1400" height="900" src=${src}>
+  `,
+    )
+    .show();
 }
 
 function onClickSearch(event) {
   event.preventDefault();
-  const searchQuery = refs.query.value;
-  const currentPage = 1;
-  const URL = getURL(searchQuery, currentPage);
-  const data = getData(URL);
+  clearGallery();
+  ImageFinder.page = 1;
+  ImageFinder.searchQuery = refs.query.value;
+  const URL = getURL();
+  getData(URL).then(generateLayout);
+}
+
+function onClickLoadMore(event) {
+  ImageFinder.page += 1;
+  const URL = getURL();
+  getData(URL).then(generateLayout);
 }
