@@ -30,23 +30,26 @@ const ImageFinder = {
   key: 'key=18267918-a545f4b922b3d8b59313b99e1',
   page: 1,
   lenguage: 'en',
+  baseURL: 'https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=',
 };
 
 refs.btnSearch.addEventListener('click', onClickSearch);
 refs.gallery.addEventListener('click', onImageClick);
 window.addEventListener('scroll', loadMore);
 
-function getURL() {
-  return `https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${ImageFinder.searchQuery}&page=${ImageFinder.page}&lang=${ImageFinder.lenguage}&per_page=12&${ImageFinder.key}`;
-}
 
+//убрать
+function getURL() {
+  return `${ImageFinder.baseURL}${ImageFinder.searchQuery}&page=${ImageFinder.page}&lang=${ImageFinder.lenguage}&per_page=12&${ImageFinder.key}`;
+}
+//исправить
 async function getData(url) {
   const response = await fetch(url);
   const data = await response.json();
   const { hits, total } = data;
   return { hits, total };
 }
-
+//добавить выше
 function generateLayout(data) {
   const layout = galleryTemplate(data.hits);
   refs.gallery.insertAdjacentHTML('beforeend', layout);
